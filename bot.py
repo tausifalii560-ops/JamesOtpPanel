@@ -1,18 +1,27 @@
 import asyncio
 
 from aiogram import Bot, Dispatcher
-from aiogram.enums import ParseMode
-from aiogram.client.default import DefaultBotProperties
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 
 from config import BOT_TOKEN
 
-bot = Bot(
-    token=BOT_TOKEN,
-    default=DefaultBotProperties(
-        parse_mode=ParseMode.HTML
-    )
-)
-
+bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
+
+
+@dp.message(CommandStart())
+async def start(message: Message):
+    await message.answer(
+        "👋 Welcome to James Store Bot!\n\n"
+        "✅ Bot is working successfully."
+    )
+
+
+async def main():
+    print("Bot Started...")
+    await dp.start_polling(bot)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
