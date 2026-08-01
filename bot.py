@@ -1,27 +1,56 @@
 import asyncio
+import sqlite3
+import os
 
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher, F
+from aiogram.enums import ParseMode
+from aiogram.client.default import DefaultBotProperties
 from aiogram.filters import CommandStart
-from aiogram.types import Message
+from aiogram.types import (
+    Message,
+    CallbackQuery,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+)
 
-from config import BOT_TOKEN
+# =========================
+# CONFIG
+# =========================
 
-bot = Bot(token=BOT_TOKEN)
+BOT_TOKEN = "PASTE_YOUR_BOT_TOKEN"
+
+ADMINS = [
+    123456789  # Replace with your Telegram ID
+]
+
+# =========================
+# BOT SETUP
+# =========================
+
+bot = Bot(
+    token=BOT_TOKEN,
+    default=DefaultBotProperties(
+        parse_mode=ParseMode.HTML
+    )
+)
+
 dp = Dispatcher()
 
+# =========================
+# DATABASE
+# =========================
 
-@dp.message(CommandStart())
-async def start(message: Message):
-    await message.answer(
-        "👋 Welcome to James Store Bot!\n\n"
-        "✅ Bot is working successfully."
-    )
+db = sqlite3.connect("bot.db")
+cursor = db.cursor()
 
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users(
+    user_id INTEGER PRIMARY KEY,
+    username TEXT,
+    first_name TEXT,
+    balance REAL DEFAULT 0,
+    orders INTEGER DEFAULT 0
+)
+""")
 
-async def main():
-    print("Bot Started...")
-    await dp.start_polling(bot)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
+db.commit()
